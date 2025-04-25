@@ -116,6 +116,10 @@ results <- rbind(results, additional_metrics)
                 
 write.csv(results, "Regression_Results.csv", row.names = FALSE)
 
+library(gtsummary)
+tbl_regression(reg1, intercept = TRUE) %>%
+  add_glance_source_note(include = c(r.squared, nobs))
+
 # Calculating Price Elasticity
 
 beta_hat <- summary(reg1)$coefficients["SUR", "Estimate"]
@@ -149,7 +153,7 @@ ggplot(data = WASDE, aes(x = SUR, y = residuals(reg1))) +
 WASDE$SUR_Inv <- 1 / WASDE$SUR
 
 # Regress corn prices on inverse SUR
-reg1 <- lm(Corn_Price ~ SUR_Inv, data = WASDE)
+reg1 <- lm(corn_price ~ SUR_Inv, data = WASDE)
 
 # Examine regression results
 summary(reg1)
@@ -159,9 +163,13 @@ install.packages("gtsummary")
 library(gtsummary)
 
 # Create a professional regression table
-reg_table <- reg1 %>%
-  tbl_regression() %>%
-  bold_p(t = 0.05)  # Bold significant results
+
+library(gtsummary)
+
+# Generate the regression table with gtsummary
+tbl_regression(reg1, intercept = TRUE) %>%
+  add_glance_source_note(include = c(r.squared, nobs)) %>%
+  bold_p(t = 0.05)  
 
 # Print the table
 reg_table
@@ -205,8 +213,11 @@ error <- cbind(error, lag_error)                              # cbind() binds th
 
 reg4 <- lm(error ~ lag_error, data=error)
 
-summary(reg4)
+library(gtsummary)
+tbl_regression(reg4, intercept = TRUE) %>%
+  add_glance_source_note(include = c(r.squared, nobs))
 
+summary(reg4)
 
 
 
